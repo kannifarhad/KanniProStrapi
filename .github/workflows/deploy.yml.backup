@@ -1,0 +1,42 @@
+name: Deploy Strapi
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted-strapi
+
+    steps:
+      - name: Log in to GitHub Packages
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Pull and Run Strapi Image
+        run: |
+          docker pull ghcr.io/${{ github.repository_owner }}/strapi:latest
+          docker stop strapi || true
+          docker rm strapi || true
+          docker run -d \
+            --name strapi \
+            -p 1337:1337 \
+            -v strapi-data:/data \
+            ghcr.io/${{ github.repository_owner }}/strapi:latest
+
+        # - name: Run the Docker Container
+        # run: |
+        #   docker run -d \
+        #     -e HOST=${{ secrets.HOST }} \
+        #     -e PORT=${{ secrets.PORT }} \
+        #     -e APP_KEYS=${{ secrets.APP_KEYS }} \
+        #     -e API_TOKEN_SALT=${{ secrets.API_TOKEN_SALT }} \
+        #     -e ADMIN_JWT_SECRET=${{ secrets.ADMIN_JWT_SECRET }} \
+        #     -e TRANSFER_TOKEN_SALT=${{ secrets.TRANSFER_TOKEN_SALT }} \
+        #     -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+        #     -e DATABASE_CLIENT=${{ secrets.DATABASE_CLIENT }} \
+        #     -e DATABASE_FILENAME=${{ secrets.DATABASE_FILENAME }} \
+        #     -p 1337:1337 \
+        #     ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest

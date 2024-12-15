@@ -1,0 +1,32 @@
+FROM node:18-slim
+
+# Install required dependencies
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set environment variable for prebuilt binaries
+ENV npm_config_build_from_source=false
+
+# Step 2: Set the working directory
+WORKDIR /usr/src/app
+
+# Step 3: Copy package.json and package-lock.json (or yarn.lock)
+COPY package*.json ./
+
+# Step 4: Install dependencies
+RUN npm install --production
+
+# Step 5: Copy the rest of the application files
+COPY . .
+
+# Step 6: Build the application
+RUN npm run build  # This step generates the dist folder
+
+# Step 7: Expose the port the app will run on
+EXPOSE 1337
+
+# Step 8: Start the Strapi application in production mode
+CMD ["npm", "start"]

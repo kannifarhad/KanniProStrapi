@@ -1,0 +1,58 @@
+name: Build and Publish Strapi Image
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  packages: write  # Allows pushing Docker images to GitHub Packages
+  contents: read
+  id-token: write
+
+env:
+  REGISTRY: ghcr.io  # GitHub Container Registry
+  IMAGE_NAME: ${{ github.repository_owner }}/kanni-pro-strapi  # Image name
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Docker Buildx for cross-platform builds
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Log in to GitHub Container Registry
+      - name: Log in to GitHub Packages
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Build and Push the Docker Image with multi-platform support
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.run_number }}
+          build-args: |
+            NODE_ENV=production
+          platforms: linux/amd64
+         # platforms: linux/amd64,linux/arm64  # Multi-platform support
+
+      # Optional: Output the image URLs
+      - name: Output Image URLs
+        run: |
+          echo "Image URLs:"
+          echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+          echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.run_number }}"
