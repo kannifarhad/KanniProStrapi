@@ -17,7 +17,7 @@
     },
     "description": {
       "type": "text",
-      "maxLength": 80
+      "maxLength": 400
     },
     "slug": {
       "type": "uid",
@@ -54,6 +54,18 @@
     },
     "fullstory": {
       "type": "richtext"
+    },
+    "articles": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::article.article",
+      "inversedBy": "relatedarticles"
+    },
+    "relatedarticles": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::article.article",
+      "mappedBy": "articles"
     }
   }
 }

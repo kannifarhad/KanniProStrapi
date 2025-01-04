@@ -1,0 +1,30 @@
+{
+  "kind": "collectionType",
+  "collectionName": "job_histories",
+  "info": {
+    "singularName": "job-history",
+    "pluralName": "job-histories",
+    "displayName": "Job History"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "companyName": {
+      "type": "string"
+    },
+    "position": {
+      "type": "string"
+    },
+    "duration": {
+      "type": "string"
+    },
+    "responsibilities": {
+      "type": "richtext"
+    },
+    "technologies": {
+      "type": "text"
+    }
+  }
+}
